@@ -1,0 +1,97 @@
+{% extends 'base.jinja2' %}
+
+{% block app_content %}
+{% set test_data = {'rating': 'A4', 'entrants' : [('Achilova, Feyza', 'D19'),('Miller, Naomi', 'C19'),('Adams,Kim', 'B19')]} %}
+{% set event_types =  ['Cadet','Junior','Division II','Division IA', 'Division I']  %}
+        <h1>Upcoming Tournaments</h1>
+  <!-- Header -->
+  {# <header class="container">
+    <h5><b><i class="fa"></i> </b></h5>
+  </header> #}
+ 
+  <div class="container">
+    <table class="table table-striped dropdown">
+      <thead>
+        <tr valign=top>
+        {# TODO Fix heading so that they're top justified #}
+            <th>Start<br>End</th>
+            <th>Name<br>Location<br>Distance/Driving Time</th>
+            <th>Type<br>Region</th>
+            <th>Opens<br>Closes<br>Withdrawal</th>
+            {% for t in event_types %}
+            <th>{{t}}</th>
+            {% endfor %}
+        </tr>
+      </thead>
+              
+      <tbody> 
+                
+        <tr><td><h4>{{ tournaments[0][0].start.strftime("%B")}}</h4></td></tr>
+          {% set ns = namespace (last_tourn_month = tournaments[0][0].start.month) %}
+                {% for tourn in tournaments %}
+                    
+                    {% set tournament=tourn[0] %}
+
+                    {% if tournament.start.month != ns.last_tourn_month %}
+                    <tr><td><h4>{{ tournament.start.strftime("%B")}}</h4></td></tr>
+                     {% set ns.last_tourn_month=tournament.start.month %}
+                    {% endif %}
+                    
+                  <tr>
+                      <td>{{ tournament.start.strftime('%#m/%#d/%y') }}-<br>
+                      {{ tournament.end.strftime('%#m/%#d/%y') }}</td>
+                      {% set tourn_link = '"https://member.usafencing.org/details/tournaments/'+tournament.id_|string +'"' %}
+                      <td> <a href={{tourn_link}}> {{ tournament.name }} </a><br>
+                       {{ tournament.city }}, {{tournament.state }}<br>
+                      {{ distances[tournament.id_][0]}}/{{ distances[tournament.id_][1]}} </td>
+                      <td>{{ tournament.type }}<br> {{ tournament.region}}</td>
+                      <td>{% if tournament.opens.year == 1900 %}
+                      TBD<br>
+                      {% else %}
+                      {{tournament.opens.strftime('%#m/%#d/%y')}}<br>
+                      {% endif %}
+                      {% if tournament.closes.year == 1900 %}
+                      TBD<br>
+                      {% else %}
+                      {# TODO highlight close date in red if it's less than 7 days away#}
+                      {{tournament.closes.strftime('%#m/%#d/%y')}}<br>
+                      {% endif %}
+                      {% if tournament.withdraw.year == 1900 %}
+                      NA
+                      {% else %}
+                      {{tournament.withdraw.strftime('%#m/%#d/%y')}}</td>
+                      {% endif %}
+                      {% for t in event_types %}
+                        {% set event=tourn[1].get(t,"") %}
+                      <td class = "row align-items-center"> <div class="dropdown">
+                        {% if event == "" %} {# If event type not in list of contested events #}
+                        <span class="col-xs-1 text-center">--<span>      {# display dashes #}
+                        {% else %} 
+                          <span>{{ event.rating}}<br>{{event.count }} fencers</span><br>
+                          {% if event.start.hour==0 %}  {# if the event time isn't set, just display day #}
+                            <span>{{ event.start.strftime('%A') }}</span>
+                          {% else %} {# othterwise display day and time#}
+                            <span>{{ event.start.strftime('%a,%#I:%M%p') }}</span>
+                          {% endif %}
+                        {% endif %}  
+                      
+                        {# <div class="dropdown-content">
+                         {% for e,rating in test_data['entrants']  %}
+                            <li>{{e }}, {{rating }}</li>
+                         {% endfor %}
+                        </div> #}
+                        </div>
+                      </td>
+                      {% endfor %}
+                      
+                  </tr>
+                 
+                {% endfor %}
+              </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>  
+
+{% endblock  %}

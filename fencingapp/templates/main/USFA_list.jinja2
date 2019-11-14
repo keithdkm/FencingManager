@@ -1,0 +1,43 @@
+{% extends 'base.jinja2' %}
+
+{% block app_content %}
+        <h1>USFA Women Foilists</h1>
+
+
+  <!-- Header -->
+  <header class="container" style="padding-top:22px">
+  
+  </header>
+        <table class="table table-striped">
+            <thead class="thead-inverse">
+                <tr>
+                    <th>Name</th>
+                    <th>Rating</th>
+                    <th>Region</th>
+                    <th>Division</th>
+                    <th>Club</th>
+                    <th>Birth Year</th>
+                    <th>Member #</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in members %}
+                <tr>
+                    <td><a href="{{ url_for('main.member',member_id=member.id_) }}">{{ member.last_name}}, {{member.first_name }}</a></td>
+                    <td>{{ member.foil }}</td>
+                    {% if member.region==7 %}
+                        <td> {{ member.representing_country }}</td>
+                    {% else %}
+                    <td>{{ member.region }}</td>
+                    {% endif %}
+                    <td> {{ member.division }} </td>
+                    <td> {{ member.club_1_name }}</td>
+                    <td>{{ member.birthdate }}</td>
+                    <td>{{ member.id_ }}
+                </tr>
+                {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+
+{% endblock  %}

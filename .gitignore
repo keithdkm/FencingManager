@@ -1,0 +1,14 @@
+fencing_competitions.db
+/.vscode/
+
+docs/Todo.md
+
+fencingapp/images/bg.jpg
+fencingapp/images/IMG_4692.jpg
+
+logs/scraped_df.csv1
+logs/scraped_df.csv2
+
+testing/
+
+*.pyc

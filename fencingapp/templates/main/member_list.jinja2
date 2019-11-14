@@ -1,0 +1,38 @@
+{% extends 'base.jinja2' %}
+
+{% block app_content %}
+        {% if members %}
+        <h1>{{ members[0].club_1_name }} Women Foilists</h1>
+        {% else %}
+        <h1> None </h1>
+        {% endif %}
+
+  <!-- Header -->
+  <header class="container" style="padding-top:22px">
+  
+  </header>
+  <div class = "container">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Rating</th>
+                    <th>Birth Year</th>
+                    <th>Member #</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in members %}
+                <tr>
+                    <td><a href="{{ url_for('main.member',member_id=member.id_) }}">
+                       {{ member.last_name}}, {{member.first_name }}</a></td>
+                    <td>{{ member.foil }}</td>
+                    <td>{{ member.birthdate }}</td>
+                    <td>{{ member.id_ }}
+                </tr>
+                {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+
+{% endblock  %}

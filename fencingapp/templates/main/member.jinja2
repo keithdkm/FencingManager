@@ -1,0 +1,15 @@
+{% extends "base.jinja2" %}
+
+{% block app_content %}
+
+    <h2>Member: {{ member.first_name }} {{ member.last_name }}</h2>
+    <br>
+    <p>
+        <span><b>Year of Birth: </b>{{ member.birthdate}}</span><br>
+        <span><b>Club: </b>{{ member.club_1_name }}</span><br>
+        <span><b>Division: </b>{{ member.division }}</span><br>
+        <span><b>Region:</b> {{ member.region }}</span><br>
+        <span><b>Foil Rating:</b> {{ member.foil }}</span><br>
+
+    </p>
+{% endblock %}
