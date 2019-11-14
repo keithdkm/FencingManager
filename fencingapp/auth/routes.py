@@ -20,7 +20,7 @@ def login():
                                                # return that page. 
         if not next_page or url_parse(next_page).netloc != "":  # ensure that URL wasn't hacked by checking for empty domain
                                                                 # as all valid flask paths are relative
-            next_page = url_for('main.tournament')     # by default, return user to tournament page
+            next_page = url_for('auth.login')     # by default, return user to tournament page
 
         if not (user and user.check_password(form.password.data)): 
             flash('Invalid username or password') # does user exist and is pw correct
