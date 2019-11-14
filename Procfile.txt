@@ -1,1 +1,1 @@
-web: flask db upgrade; gunicorn fencingapp:app
+web: flask db upgrade; gunicorn fencing:app
