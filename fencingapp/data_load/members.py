@@ -81,4 +81,16 @@ def load_members_to_db_from_csv(path_):
 
 
 
+    #######################################################################
+    # Produces pivot table or ratings broken down by region
+    # df['rating'] = df['foil'].apply(lambda x:x[0])
+    # df.pivot_table(values = ['id_'],
+    #                 index = ['region'],
+    #                 columns = ['rating'],
+    #                 aggfunc=pd.Series.nunique,
+    #                 fill_value=0).astype(int,errors='ignore')
 
+    # Ratings by birthyear
+    #df.pivot_table(values = ['id_'],index = ['birthdate'],columns= ['rating'],aggfunc=pd.Series.nunique,fill_value=0).astype(int,errors='ignore').loc[1995:2010,]
+    #
+    # Column totals for above pivot table
