@@ -69,8 +69,6 @@ def create_app(config_class=Config):
             app.logger.addHandler(mail_handler)
 
 
-    for k,v in app.config.items():
-        print (k,':',v)
     return app
 
 
