@@ -6,32 +6,36 @@ from datetime import timedelta
 from fencingapp.data_load.members import load_members_to_db_from_csv
 from fencingapp.data_load.events import load_events_to_db_from_USFA
 from fencingapp.data_load.tournaments import load_tournaments_from_USFA
-from fencingapp import db, create_app
+from fencingapp import db
 from fencingapp.models import Season,Tournament,Event,Member
 from sqlalchemy import func
 
-# app=create_app()
-# app.app_context().push()  # pushes Flask application context to this module
 
 # Refresh Members to get latest ratings data
 # TODO improve logic to set this season
 print('Loading Seasons')
-this_season = Season.query.get(1)
+st = dt.strptime
 
+this_season = Season(st("08/01/2019","%m/%d/%Y"),st("07/31/2020","%m/%d/%Y"))
+last_season = Season(st("08/01/2018","%m/%d/%Y"),st("07/31/2019","%m/%d/%Y"))
+next_season = Season(st("08/01/2020","%m/%d/%Y"),st("07/31/2021","%m/%d/%Y"))
+db.session.add_all([this_season,last_season,next_season])
+db.session.commit()
 
 # Refresh members every time app runs to get latest fencer ratings
 print ('Loading members')
 Member.query.delete()
 db.session.commit()
 # concatenates last year's file with latest downlaod from USFA website
-load_members_to_db_from_csv('C:\\Users\\kdkmb\\OneDrive\\Documents\\Fencing\\data\\\\')
+load_members_to_db_from_csv()
 
 
 # Refresh tournaments if the most recent update was more than 7 days ago
 print('starting event load')
 MAX_DAYS_SINCE_REFRESH=7
-if Tournament.query.with_entities(
-    func.max(Tournament.updated_on))[0][0]<dt.utcnow()-timedelta(days=MAX_DAYS_SINCE_REFRESH):
+if (Tournament.query.count()==0 or   # if tournament table is empty
+    Tournament.query.with_entities(  # or if it hasn't been refreshed in less 7 datas
+    func.max(Tournament.updated_on))[0][0]<dt.utcnow()-timedelta(days=MAX_DAYS_SINCE_REFRESH)):
     Tournament.query.filter(Tournament.start>dt.now()).delete()  #<- deletes data for all tournaments that haven't started
     db.session.commit()
     load_tournaments_from_USFA(this_season,whole_season=False,to_csv=False,refresh_table=True) 

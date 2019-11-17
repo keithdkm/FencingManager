@@ -111,8 +111,29 @@ class Season(Base):
     '''
     # Add an init here to preprocess data strings into dates
     
-    # def __init__(s_date,e_date):
-    #     super.__init__()
+    def __init__(self,s_date,e_date):
+        super().__init__()
+        self.start = s_date
+        self.end = e_date
+
+    # @property
+    # def start(self):
+    #     return self.__start
+    # @start.setter
+    # def start(self,value):
+    #     self.__start = dt.strptime(value,"%d/%m/%y")
+    #     print(f'Set start as {self.__start}')
+
+
+    # @property
+    # def get_end(self):
+    #     return self.__end
+    # @end.setter
+    # def set_end(self,e_date):
+    #     self.__end = dt.strptime(e_date,"%d/%m/%y")
+    #     print(f'Set end as {self.__end}')
+
+
 
     __tablename__ = 'seasons'
     

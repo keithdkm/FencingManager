@@ -2,13 +2,14 @@ import logging
 import pandas as pd
 from pathlib import Path
 from datetime import datetime as dt
+import os
 
 from fencingapp.models import Member 
 from fencingapp import db
 from fencingapp.data_load.URLs.URLs import USFA_URLs
 from fencingapp.data_load.scrapers.members import memberFile
 
-def load_members_to_db_from_csv(path_):
+def load_members_to_db_from_csv():
     '''
     retrieves the two files containing this year's and last year's members, 
     clears the existing contents of the members table
@@ -22,7 +23,8 @@ def load_members_to_db_from_csv(path_):
                       ]
     # TODO this address needs to be scraped from the website to get an up to date link otherwise it expires
     THIS_SEASONS_MEMBERS = memberFile(USFA_URLs.USFA_MEMBER_LIST).url_link
-    MEMBERS1819 = Path(path_,'members1819.csv')
+    basedir = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data')
+    MEMBERS1819 = Path(basedir,'members1819.csv')
 
     # Load data from csv files and concatenate it together
     member_file_list = [THIS_SEASONS_MEMBERS,MEMBERS1819]   # files containing the member data 
