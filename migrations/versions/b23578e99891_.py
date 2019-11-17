@@ -17,12 +17,11 @@ depends_on = None
 
 
 def upgrade():
-   # hand edited by Keith M 
-   
-    op.alter_column(
-        table_name='tournaments',
+   # hand edited by Keith M to apply changes to SQLite using batch update
+   with op.batch_alter_table('tournaments') as batch:
+    batch.alter_column(
         column_name='status',
-        nullable=False,
+        nullable=True,
         existing_type=sa.String(length=5),
         type_=sa.String(length=15)
     )
@@ -31,11 +30,12 @@ def upgrade():
 
 def downgrade():
     # hand edited by Keith M 
-     op.alter_column(
-        table_name='tournaments',
-        column_name='status',
-        nullable=False,
-        type_=sa.String(length=5),
-        existing_type=sa.String(length=5)
+    with op.batch_alter_table('tournaments') as batch:
+        batch.alter_column(
+            
+            column_name='status',
+            nullable=False,
+            type_=sa.String(length=5),
+            existing_type=sa.String(length=15)
     )
     # ### end Alembic commands ###
