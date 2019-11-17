@@ -24,7 +24,7 @@ def upgrade():
         column_name='status',
         nullable=False,
         existing_type=sa.String(length=5),
-        type_=sa.String(length=5)
+        type_=sa.String(length=15)
     )
     # ### end Alembic commands ###
 

@@ -2,6 +2,7 @@ from datetime import datetime as dt
 import random
 import pandas as pd
 import time
+import os
 from pathlib import Path
 
 from fencingapp.data_load.scrapers.tournaments import ScrapeTournamentsList,ScrapeTournamentDetails  #
@@ -108,7 +109,7 @@ def load_tournaments_from_USFA(season,whole_season=True,to_csv=True,refresh_tabl
 
     if to_csv:
         file_ = 'scraped_tournament_'+str(season.start.year)+'.csv'
-        debug_file_path = Path(r'~\OneDrive\Documents\Data Science\Python\Data Science Projects\Escrime\testing\debug\\').expanduser()   #  location of log files
+        debug_file_path = os.path.abspath('~/debug')
         tournament_df.to_csv(Path(debug_file_path,file_))  # DEBUG
     if refresh_table:
         tournament_df.to_sql('tournaments',db.engine,if_exists='append',index=False)
