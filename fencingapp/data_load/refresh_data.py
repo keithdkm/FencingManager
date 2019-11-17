@@ -6,9 +6,13 @@ from datetime import timedelta
 from fencingapp.data_load.members import load_members_to_db_from_csv
 from fencingapp.data_load.events import load_events_to_db_from_USFA
 from fencingapp.data_load.tournaments import load_tournaments_from_USFA
-from fencingapp import db
+from fencingapp import db, create_app
 from fencingapp.models import Season,Tournament,Event,Member
 from sqlalchemy import func
+
+# create application context for job to run in
+app = create_app()
+app.app_context().push() 
 
 
 # Refresh Members to get latest ratings data
