@@ -92,7 +92,7 @@ class Tournament(Base):
     region = db.Column(db.String(5)) 
     type = db.Column(db.String(20))
     season_id = db.Column(db.Integer,db.ForeignKey ('seasons.id_'))   # Creates the link to the season instance
-    status = db.Column(db.String(5))  # <-this changed
+    status = db.Column(db.String(15))  # <-this changed
     created_on = db.Column(db.DateTime, default=dt.now)
     updated_on = db.Column(db.DateTime, default=dt.now, onupdate=dt.now)
     events = db.relationship('Event',
@@ -100,6 +100,7 @@ class Tournament(Base):
                                 backref = 'tournament',
                                 lazy='dynamic',
                                 cascade = "all,delete, delete-orphan")
+    
     
     def __repr__(self):
         return f'{self.name}, {self.city}, {self.state}, {dt.strftime(self.start, "%B %d, %Y")}'
