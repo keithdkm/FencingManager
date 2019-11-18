@@ -82,14 +82,14 @@ class Tournament(Base):
     ft_id = db.Column(db.String(80))                  # Fencing Time Live ID
     venue = db.Column(db.String(80))
     city =  db.Column(db.String(80))
-    state = db.Column(db.String(5))
+    state = db.Column(db.String(15))
     name = db.Column(db.String(80))  #tournament name
     opens = db.Column(db.DateTime)   # tournament registration opens
     closes = db.Column(db.DateTime)   # registration deadline
     withdraw = db.Column(db.DateTime) # withdrawal deadline
     start = db.Column(db.DateTime)   #tournament start date
     end = db.Column(db.DateTime)    # tournament end date
-    region = db.Column(db.String(5)) 
+    region = db.Column(db.String(15)) 
     type = db.Column(db.String(20))
     season_id = db.Column(db.Integer,db.ForeignKey ('seasons.id_'))   # Creates the link to the season instance
     status = db.Column(db.String(15))  # <-this changed
@@ -100,7 +100,8 @@ class Tournament(Base):
                                 backref = 'tournament',
                                 lazy='dynamic',
                                 cascade = "all,delete, delete-orphan")
-    
+    delete_me = db.Column(db.String(5))  # dummy column to force alembic to generate a new version
+
     
     def __repr__(self):
         return f'{self.name}, {self.city}, {self.state}, {dt.strftime(self.start, "%B %d, %Y")}'
