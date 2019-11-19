@@ -100,9 +100,7 @@ class Tournament(Base):
                                 backref = 'tournament',
                                 lazy='dynamic',
                                 cascade = "all,delete, delete-orphan")
-    delete_me = db.Column(db.String(5))  # dummy column to force alembic to generate a new version
 
-    
     def __repr__(self):
         return f'{self.name}, {self.city}, {self.state}, {dt.strftime(self.start, "%B %d, %Y")}'
 
