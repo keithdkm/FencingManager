@@ -18,11 +18,13 @@ depends_on = None
 
 def upgrade():
     op.alter_column(
+        table_name='tournaments',
         column_name='region',
         nullable=True,
         existing_type=sa.String(length=5),
         type_=sa.String(length=15))
     op.alter_column(
+        table_name='tournaments',
         column_name='state',
         nullable=True,
         existing_type=sa.String(length=5),
@@ -32,11 +34,13 @@ def upgrade():
 
 def downgrade():
     op.alter_column(
+        table_name='tournaments',
         column_name='region',
         nullable=True,
         existing_type=sa.String(length=15),
         type_=sa.String(length=5))
     op.alter_column(
+        table_name='tournaments',
         column_name='state',
         nullable=True,
         existing_type=sa.String(length=15),
