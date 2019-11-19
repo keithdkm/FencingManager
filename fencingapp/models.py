@@ -164,7 +164,7 @@ class Event(Base):
     name = db.Column(db.String(40), nullable=False)
     type = db.Column(db.String(20),nullable=False)  #<=== changed to 20 in 7fa9b0f30ee7
     weapon = db.Column(db.String(10), nullable=False)
-    gender = db.Column(db.String(10), nullable=False) 
+    gender = db.Column(db.String(10), nullable=False) #<==changed to 20 in a485de8c06db
     abbreviation = db.Column(db.String(3),nullable=True)
     count = db.Column(db.Integer,nullable=True)   # entrant count
     rating = db.Column(db.String(2),nullable=True)  # calculated rating of event 
@@ -173,9 +173,7 @@ class Event(Base):
     status = db.Column(db.String(10), nullable = True)
     created_on = db.Column(db.DateTime, default=dt.now)
     updated_on = db.Column(db.DateTime, default=dt.now, onupdate=dt.now)
-########################3
-#   Dummy column
-    delete_me = db.Column(db.String(5))
+
     def __repr__(self):
         return f'{self.name}, {self.rating} event with {self.count} entrants'
     
