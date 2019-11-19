@@ -17,32 +17,30 @@ depends_on = None
 
 
 def upgrade():
-    with op.batch_alter_table('tournaments') as batch:
-        batch.alter_column(
-            column_name='region',
-            nullable=True,
-            existing_type=sa.String(length=5),
-            type_=sa.String(length=15))
-        batch.alter_column(
-            column_name='state',
-            nullable=True,
-            existing_type=sa.String(length=5),
-            type_=sa.String(length=15)
+    op.alter_column(
+        column_name='region',
+        nullable=True,
+        existing_type=sa.String(length=5),
+        type_=sa.String(length=15))
+    op.alter_column(
+        column_name='state',
+        nullable=True,
+        existing_type=sa.String(length=5),
+        type_=sa.String(length=15)
         )    # ### end Alembic commands ###
 
 
 def downgrade():
-    with op.batch_alter_table('tournaments') as batch:
-        batch.alter_column(
-            column_name='region',
-            nullable=True,
-            existing_type=sa.String(length=15),
-            type_=sa.String(length=5))
-        batch.alter_column(
-            column_name='state',
-            nullable=True,
-            existing_type=sa.String(length=15),
-            type_=sa.String(length=5)
+    op.alter_column(
+        column_name='region',
+        nullable=True,
+        existing_type=sa.String(length=15),
+        type_=sa.String(length=5))
+    op.alter_column(
+        column_name='state',
+        nullable=True,
+        existing_type=sa.String(length=15),
+        type_=sa.String(length=5)
         )    # ### end Alembic commands ###
 
     # ### end Alembic commands ###
