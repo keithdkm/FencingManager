@@ -162,10 +162,10 @@ class Event(Base):
 
     id_ = db.Column(db.Integer, primary_key=True, autoincrement=False)
     name = db.Column(db.String(40), nullable=False)
-    type = db.Column(db.String(20),nullable=False)  #<=== changed to 20 in 7fa9b0f30ee7
+    type = db.Column(db.String(20),nullable=True)  #<=== changed to 20 in 7fa9b0f30ee7
     weapon = db.Column(db.String(10), nullable=False)
     gender = db.Column(db.String(10), nullable=False) #<==changed to 10 in a485de8c06db
-    abbreviation = db.Column(db.String(3),nullable=True)
+    abbreviation = db.Column(db.String(10),nullable=True)  # <= changed to 10 in 6a3ff88da143
     count = db.Column(db.Integer,nullable=True)   # entrant count
     rating = db.Column(db.String(2),nullable=True)  # calculated rating of event 
     tournament_id = db.Column(db.Integer,db.ForeignKey('tournaments.id_'))
