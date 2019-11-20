@@ -17,19 +17,33 @@ depends_on = None
 
 
 def upgrade():
+
     with op.batch_alter_table('events') as batch:
         batch.alter_column(
             column_name='type',
             nullable=True,
             existing_type=sa.String(length=10),
             type_=sa.String(length=20))
-    # ### end Alembic commands ###
+
+        batch.alter_column(
+            column_name = 'gender',
+            type_ = sa.VARCHAR(length=10),
+            existing_type=sa.VARCHAR(length=1),
+            nullable=True)
+
 
 
 def downgrade():
        with op.batch_alter_table('events') as batch:
-        batch.alter_column(
-            column_name='type',
-            nullable=True,
-            type_=sa.String(length=10),
-            existing_type=sa.String(length=20))
+            batch.alter_column(
+                column_name='type',
+                nullable=True,
+                type_=sa.String(length=10),
+                existing_type=sa.String(length=20))
+                
+            batch.alter_column(
+                column_name = 'gender',
+                type_ = sa.VARCHAR(length=1),
+                existing_type=sa.VARCHAR(length=10),
+                nullable=True)
+    # ### end Alembic commands ###
