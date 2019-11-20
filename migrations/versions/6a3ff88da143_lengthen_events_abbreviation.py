@@ -5,6 +5,8 @@ Revises: a485de8c06db
 Create Date: 2019-11-19 18:22:20.111881
 
 """
+# This is the first Alembic script that updates both local and remote databases
+# 
 from alembic import op
 import sqlalchemy as sa
 # added to give access to database engine type. If it's sqlite, use a different upgrade path
