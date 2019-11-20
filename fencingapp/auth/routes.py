@@ -16,19 +16,19 @@ def login():
     form = LoginForm()  # create an instance of form to retrieve login inro
     if form.validate_on_submit():  # if user submits valid input, search user table
         user = User.query.filter_by(username = form.username.data).first() 
+        if user is None or not user.check_password(form.password.data): 
+            flash('Invalid username or password') # does user exist and is pw correct
+            return redirect(url_for('auth.login'))    # if not return to login page
+        
+        login_user(user,remember=form.remember_me.data) # if valid, log user in
+
         next_page = request.args.get('next')    # if user was trying visit a page that required login
                                                # return that page. 
         if not next_page or url_parse(next_page).netloc != "":  # ensure that URL wasn't hacked by checking for empty domain
-                                                                # as all valid flask paths are relative
-            next_page = url_for('auth.login')     # by default, return user to tournament page
+                                                     # as all valid flask paths are relative
+            next_page = url_for('main.tournament')     # by default, return user to tournament page
 
-        if not (user and user.check_password(form.password.data)): 
-            flash('Invalid username or password') # does user exist and is pw correct
-            return redirect(next_page)    # if not return to login page
-        login_user(user,remember=form.remember_me.data) # if valid, log user in
-        # next_page = request.args.get('next')    # if user was trying visit a page that required login
-        #                                        # return that page. 
-
+    
         return redirect(next_page)     # and send them to tournament page
     return render_template('auth/login.jinja2', title = 'Sign In',form = form)
 

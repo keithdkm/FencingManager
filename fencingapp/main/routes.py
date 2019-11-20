@@ -14,6 +14,7 @@ from fencingapp.main import bp
 
 ############################
 # Flask endpoints
+@bp.route('/')
 @bp.route('/index')  # creates mapping between given URL and the function it decorates
 @bp.route('/tournament')
 def tournament():
