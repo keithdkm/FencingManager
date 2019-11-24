@@ -28,19 +28,23 @@ db.session.commit()
 
 # Refresh members every time app runs to get latest fencer ratings
 print ('Loading members')
-Member.query.delete()
-db.session.commit()
-# concatenates last year's file with latest downlaod from USFA website
+
 load_members_to_db_from_csv()
 
+print('Members loaded successfully')
 
 # Refresh tournaments if the most recent update was more than 7 days ago
 print('starting event load')
 MAX_DAYS_SINCE_REFRESH=7
-if (Tournament.query.count()==0 or   # if tournament table is empty
-    Tournament.query.with_entities(  # or if it hasn't been refreshed in less 7 datas
-    func.max(Tournament.updated_on))[0][0]<dt.utcnow()-timedelta(days=MAX_DAYS_SINCE_REFRESH)):
+Tournament_data_stale = Tournament.query.with_entities(  
+    func.max(Tournament.updated_on))[0][0]<dt.utcnow()-timedelta(days=MAX_DAYS_SINCE_REFRESH)
+if (Tournament.query.count()==0 or Tournament_data_stale):
+     # if tournament table is empty or if it hasn't been refreshed
+    db.engine.execute('ALTER TABLE events DROP CONSTRAINT events_tournament_id_fkey')  # drop FK constraint with user table
+    db.session.commit()    
     Tournament.query.filter(Tournament.start>dt.now()).delete()  #<- deletes data for all tournaments that haven't started
+    db.session.commit()
+    db.engine.execute('ALTER TABLE events ADD CONSTRAINT events_tournaments_id_fkey FOREIGN_KEY(tournament_id) REFERENCES tournaments(id_)')
     db.session.commit()
     load_tournaments_from_USFA(this_season,whole_season=False,to_csv=False,refresh_table=True) 
 

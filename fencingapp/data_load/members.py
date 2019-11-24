@@ -11,7 +11,8 @@ from fencingapp.data_load.scrapers.members import memberFile
 
 def load_members_to_db_from_csv():
     '''
-    retrieves the two files containing this year's and last year's members, 
+    retrieves the files containing previous years' members,
+    and concatentates with newly downloaded membership file 
     clears the existing contents of the members table
     fast load them into the members table using the SQLAlchemy Core for speed.
     '''
@@ -21,13 +22,18 @@ def load_members_to_db_from_csv():
                     #  "Background Check Expires",
                     #  "SafeSport Expires"
                       ]
-    # TODO this address needs to be scraped from the website to get an up to date link otherwise it expires
+    Member_table_empty = Member.query.count()==0
+    # Fetch a fresh URL link for the current member list file
     THIS_SEASONS_MEMBERS = memberFile(USFA_URLs.USFA_MEMBER_LIST).url_link
-    basedir = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data')
-    MEMBERS1819 = Path(basedir,'members1819.csv')
+    member_file_list=[THIS_SEASONS_MEMBERS]
+    if Member_table_empty:  # if the member list is empty then reload ALL past member lists
+        # TODO add logic to iterate through all the member files in this directory  
+        basedir = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data')
+        MEMBERS1819 = Path(basedir,'members1819.csv')  
+        member_file_list.append(MEMBERS1819)
 
     # Load data from csv files and concatenate it together
-    member_file_list = [THIS_SEASONS_MEMBERS,MEMBERS1819]   # files containing the member data 
+       # files containing the member data 
     member_data = pd.DataFrame()   # Empty dataframe 
     for member_file in member_file_list: #concatenate this year's and last year's membership list
         member_data = member_data.append(
@@ -56,12 +62,21 @@ def load_members_to_db_from_csv():
     # Populate date/time into updated and created fields
     member_data['updated_on'] = member_data['created_on'] = dt.utcnow()
 
+    #clear the existing contents of the member table
+    db.engine.execute('ALTER TABLE users DROP CONSTRAINT users_member_id_fkey')  # drop FK constraint with user table
+    db.session.commit()
+    Member.query.delete()
+    db.session.commit()
+    # add back FK constraint
+    db.engine.execute('ALTER TABLE users ADD CONSTRAINT users_member_id_fkey FOREIGN KEY(member_id) REFERENCES members (id_)')
+    db.session.commit()
+
     try:
         member_data.to_sql('members',db.engine,if_exists='append',index=False)
-    except:
-        print ('Member list update failed')
+    except Exception as e:
+        print ('Member list update failed. Error is', e)
     else:
-        print('Member list updated')
+        print('Member list updated successfully')
 
     return
     # Insert the dataframe into the database in bulk inserts of chunks of rows
