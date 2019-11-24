@@ -31,12 +31,12 @@ def load_members_to_db_from_csv():
         basedir = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data')
         MEMBERS1819 = Path(basedir,'members1819.csv')  
         member_file_list.append(MEMBERS1819)
-    print(member_file_list)
+
     # Load data from csv files and concatenate it together
        # files containing the member data 
     member_data = pd.DataFrame()   # Empty dataframe 
     for member_file in member_file_list: #concatenate this year's and last year's membership list
-        print(f'fetching {member_file}')
+
         member_data = member_data.append(
                         pd.read_csv(member_file, # this season's members
                                 header = 0 ,
@@ -70,19 +70,18 @@ def load_members_to_db_from_csv():
     print("deleting old table contents")
     Member.query.delete()
     db.session.commit()
-    # add back FK constraint
-    db.engine.execute('ALTER TABLE users ADD CONSTRAINT users_member_id_fkey FOREIGN KEY(member_id) REFERENCES members (id_)')
-    db.session.commit()
-    print('reinstating user table constraint')
-    
+
     try:
         member_data.to_sql('members',db.engine,if_exists='append',index=False)
     except Exception as e:
         print ('Member list update failed. Error is', e)
     else:
         print('Member list updated successfully')
-
-    return
+        print('reinstating user table constraint')
+        db.engine.execute('ALTER TABLE users ADD CONSTRAINT users_member_id_fkey FOREIGN KEY(member_id) REFERENCES members (id_)')
+        db.session.commit()
+    finally:
+        return
     # Insert the dataframe into the database in bulk inserts of chunks of rows
     # db.session.execute(Member.__table__.delete())          # delete all rows from the members table
  

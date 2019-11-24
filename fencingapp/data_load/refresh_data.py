@@ -34,7 +34,7 @@ load_members_to_db_from_csv()
 print('Members loaded successfully')
 
 # Refresh tournaments if the most recent update was more than 7 days ago
-print('starting event load')
+print('Starting tournament load')
 MAX_DAYS_SINCE_REFRESH=7
 Tournament_data_stale = Tournament.query.with_entities(  
     func.max(Tournament.updated_on))[0][0]<dt.utcnow()-timedelta(days=MAX_DAYS_SINCE_REFRESH)
@@ -47,12 +47,16 @@ if (Tournament.query.count()==0 or Tournament_data_stale):
     db.engine.execute('ALTER TABLE events ADD CONSTRAINT events_tournaments_id_fkey FOREIGN_KEY(tournament_id) REFERENCES tournaments(id_)')
     db.session.commit()
     load_tournaments_from_USFA(this_season,whole_season=False,to_csv=False,refresh_table=True) 
+    print('Tournament refresh complete')
+else:
+    print('No tournament refresh required')
 
-print('Tournament refresh complete')
+
 # Refresh events
 
 t_list = Tournament.query.filter(Tournament.start>dt.utcnow()) # Select all tournaments that haven't started yet
 # model now cascades event deletes from tournament deletes sp they don't have to be deleted here
+print('Refreshing event info for all future tournaments')
 for t in t_list:
     Event.query.filter_by(tournament_id=t.id_).delete() # delete events for each tournament
     db.session.commit()
