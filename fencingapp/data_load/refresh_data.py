@@ -35,12 +35,17 @@ print('Members loaded successfully')
 
 # Refresh tournaments if the most recent update was more than 7 days ago
 print('Starting tournament load')
-MAX_DAYS_SINCE_REFRESH=7
-Tournament_data_stale = Tournament.query.with_entities(  
-    func.max(Tournament.updated_on))[0][0]<dt.utcnow()-timedelta(days=MAX_DAYS_SINCE_REFRESH)
-if (Tournament.query.count()==0 or Tournament_data_stale):
+MAX_DAYS_SINCE_TOURNAMENT_REFRESH=7
+Tournament_data_stale = Tournament.query.count()==0 or\
+                        Tournament.query.with_entities(  
+                            func.max(Tournament.updated_on))[0][0]<\
+                            dt.utcnow()-timedelta(days=MAX_DAYS_SINCE_TOURNAMENT_REFRESH)
+if Tournament_data_stale:
      # if tournament table is empty or if it hasn't been refreshed
-    load_tournaments_from_USFA(this_season,whole_season=False,to_csv=False,refresh_table=True) 
+    load_tournaments_from_USFA(this_season,
+                                whole_season=False,
+                                to_csv=False,
+                                refresh_table=True) 
     print('Tournament refresh complete')
 else:
     print('No tournament refresh required')
