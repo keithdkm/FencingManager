@@ -64,7 +64,7 @@ def load_members_to_db_from_csv():
     member_data['updated_on'] = member_data['created_on'] = dt.utcnow()
 
     #clear the existing contents of the member table
-    print('dropping user table constraint')
+    print('dropping user table constraint')                          # TODO remove hardcoded CONSTRAINT name
     db.engine.execute('ALTER TABLE users DROP CONSTRAINT users_member_id_fkey')  # drop FK constraint with user table
     db.session.commit()
     print("deleting old table contents")
@@ -77,27 +77,19 @@ def load_members_to_db_from_csv():
         print ('Member list update failed. Error is', e)
     else:
         print('Member list updated successfully')
-        print('reinstating user table constraint')
-        db.engine.execute('ALTER TABLE users ADD CONSTRAINT users_member_id_fkey FOREIGN KEY(member_id) REFERENCES members (id_)')
+        print('reinstating user table constraint')                             
+        db.engine.execute(# TODO remove hardcoded CONSTRAINT name
+            'ALTER TABLE users \
+                ADD CONSTRAINT users_member_id_fkey\
+                    FOREIGN KEY(member_id)\
+                    REFERENCES members (id_)')
         db.session.commit()
     finally:
         return
     # Insert the dataframe into the database in bulk inserts of chunks of rows
     # db.session.execute(Member.__table__.delete())          # delete all rows from the members table
  
-    ##################################################################
-    # Using sqlalchemy core.  Not optimized for speed as this load is done infrequently
-    # https://exceptionshub.com/bulk-insert-with-sqlalchemy-orm.html was a helpful source
-    # could likely be done much faster with pandas_to_sql
-    # chunk_size = 35   # take 35 rows at a time.  
-    # member_data = member_data.to_dict(orient='split')['data']  # convert dataframe to list of lists
-    # for rows in range(chunk_size,len(member_data), chunk_size):  # load 35 rows at a time , the max allowed by SQLite
-    #     try:                                                     #  (24cols x 35 rows = 880, <999)
-    #         db.session.execute(Member.__table__.insert().values(member_data[(rows-chunk_size):rows]))  # values here expects lists/tuples, without it
-    #     except Exception as e:                                                          # a list of dicts must be passed
-    #         logger.warning (f'{e.args}: Member data record chunk load failed for {member_data[(rows-chunk_size):rows]}' )
-    #     else:
-    #         logger.info(f'{Member.__tablename__} loaded successfully')
+  
 
 
 

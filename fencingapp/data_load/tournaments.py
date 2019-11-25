@@ -11,12 +11,11 @@ from fencingapp.data_load.URLs.URLs import USFA_URLs
 from fencingapp import db
 from fencingapp.models import Tournament
 
-def load_tournaments_from_USFA(season,whole_season=True,to_csv=True,refresh_table=False):  #scrapes and parses html tournament summary data from USFA 
+def load_tournaments_from_USFA(season,whole_season=True,to_csv=True,refresh_table=False): 
     ''' retrieves all the tournaments for the current season from USFA, 
-        iterating through pages of results
-         of national tournaments and each of the types and returning a list of Tournaments.
-         If whole_season is True, ti loads all the tournaments, otherwise it loads tournaments that 
-         start after today
+        iterating through pages of results of national tournaments and each of the types
+        and returning a list of Tournaments. If whole_season is True, it loads all the 
+        tournaments, otherwise it loads tournaments that start after today
     '''
 
     REGIONAL_TOURNAMENT_TYPES = {
@@ -78,7 +77,6 @@ def load_tournaments_from_USFA(season,whole_season=True,to_csv=True,refresh_tabl
     if not whole_season: # 
         tournament_df = tournament_df[tournament_df.start>dt.now()]
 
-    # https://member.usafencing.org/search/tournaments/regional?search=&filter_by_region=all&filter_by_weapon=&filter_by_gender=all&event_scopes=sjcc&filter_by_type=&filter_by_event_type=&filter_by_show=future&designated=
     #     Populate Region number for Regional Tournaments
     tournament_df['region'] = tournament_df.apply(
         lambda x: REGION_MAP.get(
@@ -95,7 +93,7 @@ def load_tournaments_from_USFA(season,whole_season=True,to_csv=True,refresh_tabl
                         .drop_duplicates('id_')
                                 )
 
-    # Populate tournament deadline
+    # Populate tournament deadline dates for each tournament
     tournament_df[['opens','closes','withdraw']] = (tournament_df.apply( 
         lambda x: pd.Series(ScrapeTournamentDetails(x['id_']).registration_dates),axis=1))
 
@@ -107,11 +105,32 @@ def load_tournaments_from_USFA(season,whole_season=True,to_csv=True,refresh_tabl
     
     tournament_df['status'] = tournament_df.apply(status, axis = 1 )
 
+    # generate csv file and/or refresh table 
     if to_csv:
         file_ = 'scraped_tournament_'+str(season.start.year)+'.csv'
         debug_file_path = os.path.abspath('~/debug')
         tournament_df.to_csv(Path(debug_file_path,file_))  # DEBUG
     if refresh_table:
-        tournament_df.to_sql('tournaments',db.engine,if_exists='append',index=False)
-    
+        db.engine.execute(                          # TODO remove hardcoded CONSTRAINT name
+            'ALTER TABLE events \
+                DROP CONSTRAINT events_tournament_id_fkey')  # drop FK constraint with user table
+        db.session.commit()
+        if whole_season:                      # if whole season being refreshed
+            Tournament.query\
+                      .filter(Tournament.start>season.start)\
+                      .delete()               # delete all tournaments in required season
+        else:
+            Tournament.query\
+                      .filter(Tournament.start>dt.now())\
+                      .delete()               # deletes data for all tournaments that haven't started
+        db.session.commit()                   # commit the delete
+
+
+        tournament_df.to_sql(
+            'tournaments',db.engine,if_exists='append',index=False) # write new tournament data to table
+        db.engine.execute(                                          # TODO remove hardcoded CONSTRAINT name
+            'ALTER TABLE events\
+                 ADD CONSTRAINT events_tournaments_id_fkey\
+                 FOREIGN_KEY(tournament_id) REFERENCES tournaments(id_)')
+        db.session.commit()   
     return 
