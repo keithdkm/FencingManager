@@ -1,30 +1,38 @@
+import os
 import random
 import time
 from datetime import datetime as dt
 from datetime import timedelta
 
-from fencingapp.data_load.members import load_members_to_db_from_csv
-from fencingapp.data_load.events import load_events_to_db_from_USFA
-from fencingapp.data_load.tournaments import load_tournaments_from_USFA
-from fencingapp import db, create_app
-from fencingapp.models import Season,Tournament,Event,Member
 from sqlalchemy import func
+
+from fencingapp import create_app, db
+from fencingapp.data_load.events import load_events_to_db_from_USFA
+from fencingapp.data_load.members import load_members_to_db_from_csv
+from fencingapp.data_load.tournaments import load_tournaments_from_USFA
+from fencingapp.models import Event, Member, Season, Tournament
+
+print(f"Current working directory is {os.getcwd()}")
+
 
 # create application context for job to run in
 app = create_app()
 app.app_context().push() 
 
 
+
+
+
 # Refresh Members to get latest ratings data
 # TODO improve logic to set this season
-print('Loading Seasons')
-st = dt.strptime
+# print('Loading Seasons')
+# st = dt.strptime
 
-this_season = Season(st("08/01/2019","%m/%d/%Y"),st("07/31/2020","%m/%d/%Y"))
-last_season = Season(st("08/01/2018","%m/%d/%Y"),st("07/31/2019","%m/%d/%Y"))
-next_season = Season(st("08/01/2020","%m/%d/%Y"),st("07/31/2021","%m/%d/%Y"))
-db.session.add_all([this_season,last_season,next_season])
-db.session.commit()
+# this_season = Season(st("08/01/2019","%m/%d/%Y"),st("07/31/2020","%m/%d/%Y"))
+# last_season = Season(st("08/01/2018","%m/%d/%Y"),st("07/31/2019","%m/%d/%Y"))
+# next_season = Season(st("08/01/2020","%m/%d/%Y"),st("07/31/2021","%m/%d/%Y"))
+# db.session.add_all([this_season,last_season,next_season])
+# db.session.commit()
 
 # Refresh members every time app runs to get latest fencer ratings
 print ('Loading members')
@@ -36,19 +44,24 @@ print('Members loaded successfully')
 # Refresh tournaments if the most recent update was more than 7 days ago
 print('Starting tournament load')
 MAX_DAYS_SINCE_TOURNAMENT_REFRESH=7
-Tournament_data_stale = Tournament.query.count()==0 or\
-                        Tournament.query.with_entities(  
-                            func.max(Tournament.updated_on))[0][0]<\
-                            dt.utcnow()-timedelta(days=MAX_DAYS_SINCE_TOURNAMENT_REFRESH)
-if Tournament_data_stale:
-     # if tournament table is empty or if it hasn't been refreshed
-    load_tournaments_from_USFA(this_season,
-                                whole_season=False,
+Tournament_table_empty = Tournament.query.count()==0
+if Tournament_table_empty:
+        load_tournaments_from_USFA(this_season,
+                                whole_season=True,
                                 to_csv=False,
                                 refresh_table=True) 
+else:    
+    Tournament_data_stale = Tournament.query.with_entities( # get date of most recent update to tournament table
+                            func.max(Tournament.updated_on))[0][0]<\
+                            dt.utcnow()-timedelta(days=MAX_DAYS_SINCE_TOURNAMENT_REFRESH)
+    if Tournament_data_stale:
+         # if tournament table is empty or if it hasn't been refreshed
+        load_tournaments_from_USFA(this_season,
+                                    whole_season=False,
+                                    to_csv=False,
+                                    refresh_table=True) 
     print('Tournament refresh complete')
-else:
-    print('No tournament refresh required')
+
 
 
 # Refresh events
@@ -100,4 +113,3 @@ print('Event refresh complete')
 
 
 # logger = logging.getLogger('fencing')
-

@@ -64,7 +64,7 @@ class ScrapeTournamentsList:
             page_wait = random.uniform(0,3)
             
             time.sleep(page_wait)
-        print(f'retrieved {self.results.shape[0]} {self.tourn_type} events') 
+        print(f'retrieved {self.results.shape[0]} {self.tourn_type} tournaments') 
         # rename National tournament type to NAC
         self.results.loc[self.results['type'] == 'National','type'] = 'NAC'
 
