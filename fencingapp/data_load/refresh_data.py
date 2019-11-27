@@ -33,6 +33,7 @@ app.app_context().push()
 # next_season = Season(st("08/01/2020","%m/%d/%Y"),st("07/31/2021","%m/%d/%Y"))
 # db.session.add_all([this_season,last_season,next_season])
 # db.session.commit()
+this_season = Season.query.filter(Season.start<=dt.today(),Season.end>=dt.today()).first()
 
 # Refresh members every time app runs to get latest fencer ratings
 print ('Loading members')
