@@ -47,6 +47,7 @@ print('Starting tournament load')
 MAX_DAYS_SINCE_TOURNAMENT_REFRESH=7
 Tournament_table_empty = Tournament.query.count()==0
 if Tournament_table_empty:
+        db.session.commit()   # removes locks on table
         load_tournaments_from_USFA(this_season,
                                 whole_season=True,
                                 to_csv=False,
@@ -55,8 +56,10 @@ else:
     Tournament_data_stale = Tournament.query.with_entities( # get date of most recent update to tournament table
                             func.max(Tournament.updated_on))[0][0]<\
                             dt.utcnow()-timedelta(days=MAX_DAYS_SINCE_TOURNAMENT_REFRESH)
+
     if Tournament_data_stale:
          # if tournament table is empty or if it hasn't been refreshed
+        db.session.commit()    # removes locks on table
         load_tournaments_from_USFA(this_season,
                                     whole_season=False,
                                     to_csv=False,
