@@ -13,8 +13,6 @@ app = create_app()
 # app.app_context().push()  
 # from fencingapp.data_load import refresh_data
 
-#  from fencingapp.data_load import refresh_data   # included for debugging data refresh
-
 
 @app.shell_context_processor
 def make_shell_context():   # automatically adds database engine and model to flask session
