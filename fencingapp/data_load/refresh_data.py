@@ -52,7 +52,7 @@ if Tournament_table_empty:
                                 whole_season=True,
                                 to_csv=False,
                                 refresh_table=True) 
-else:    
+else:
     Tournament_data_stale = Tournament.query.with_entities( # get date of most recent update to tournament table
                             func.max(Tournament.updated_on))[0][0]<\
                             dt.utcnow()-timedelta(days=MAX_DAYS_SINCE_TOURNAMENT_REFRESH)
@@ -65,8 +65,6 @@ else:
                                     to_csv=False,
                                     refresh_table=True) 
     print('Tournament refresh complete')
-
-
 
 # Refresh events
 

@@ -14,6 +14,7 @@ from fencingapp.main import bp
 
 ############################
 # Flask endpoints
+############################
 @bp.route('/')
 @bp.route('/index')  # creates mapping between given URL and the function it decorates
 @bp.route('/tournament')
@@ -51,20 +52,13 @@ def tournament():
         return res
 
     today = dt.utcnow()
-    if today.month>=8:
-        this_season = (Season.query
-                      .filter(Season.start==dt.strptime('8-1-'+ str(today.year), "%m-%d-%Y"))
-                      .first())
-        last_season = (Season.query
-                      .filter(Season.start==dt.strptime('8-1-'+ str(today.year-1), "%m-%d-%Y"))
-                      .first())
-    else:
-        this_season = (Season.query
-                      .filter(Season.start==dt.strptime('8-1-'+ str(today.year-1), "%m-%d-%Y"))
-                      .first())
-        last_season = (Season.query
-                      .filter(Season.start==dt.strptime('8-1-'+ str(today.year-2), "%m-%d-%Y"))
-                      .first())
+    this_time_last_year = today - timedelta(days=365)
+    
+    this_season = Season.query.filter(
+        Season.start<=today,Season.end>=today).first()
+    last_season = Season.query.filter(
+        Season.start<=this_time_last_year,Season.end>=this_time_last_year).first()
+    
 
     TARGET_TOURNAMENTS = ['NAC','JO','ROC','SJCC',"National"]
     TARGET_EVENTS = ['Cadet', 'Junior', 'Division II', 'Division IA', 'Division I']
@@ -72,15 +66,15 @@ def tournament():
     TARGET_GENDERS = ['Women']
     YESTERDAY = dt.now() - timedelta(days=1)
 
-    tourn_l =  (Tournament.query.filter(or_(Tournament.type.in_(TARGET_TOURNAMENTS),Tournament.region=='3'))
-                   .filter((Tournament.end )>YESTERDAY)
-                   .order_by(Tournament.start))
-
+    tourn_l =  (Tournament.query.filter(
+                                    or_(Tournament.type.in_(TARGET_TOURNAMENTS),Tournament.region=='3'))
+                                .filter((Tournament.end )>YESTERDAY)
+                                .order_by(Tournament.start))
 
     if not tourn_l:
         return render_template('errors/404.jinja2',message = 'No Tournaments found')
     else:
-        event_l = [(t,{a.type:a for a in t.events   #select onlt those events that are Women, Foil and 
+        event_l = [(t,{a.type:a for a in t.events   #select only those events that are Women, Foil and 
             .filter(db.and_(Event.weapon.in_(TARGET_WEAPONS),   # in the right age groups and return in dictionary
                             Event.gender.in_(TARGET_GENDERS),  # should this logic be on the page
                             Event.type.in_(TARGET_EVENTS)))}) for t in tourn_l]
@@ -89,9 +83,14 @@ def tournament():
         # TODO set start point to be start point of signed in user
         tournament_distances = distance(['Concord,MA'],tourn_l)
 
-        return render_template('main/tournament_list.jinja2',tournaments = event_l, 
-                                                        distances = tournament_distances,
-                                                        title = 'Tournaments')
+        refresh_date = Event.query.with_entities( 
+                            func.max(Event.updated_on)).first()
+
+        return render_template('main/tournament_list.jinja2',
+                                tournaments = event_l, 
+                                distances = tournament_distances,
+                                refresh_date = refresh_date,
+                                title = 'Tournaments')
 
 
 @bp.route('/club')
@@ -107,7 +106,9 @@ def club():
 
     club_members = sorted(club_members,key = lambda x:(x[3][0],-int(x[3][1:]),int(x[4])))   
             
-    return render_template('main/member_list.jinja2', members=club_members, title='Female Foilists')
+    return render_template('main/member_list.jinja2', 
+                            members=club_members, 
+                            title='Female Foilists')
 
 
 @bp.route('/USFA')
@@ -121,7 +122,14 @@ def USFA():
             .filter(Member.gender == 'F')
             .all())
 
-    USFA_members = sorted(USFA_members,key = lambda member:(member.region, member.foil[0],-int(member.foil[1:]),member.last_name,member.first_name))  
+    USFA_members = sorted(data = USFA_members,
+                          key = lambda member:(
+                              member.region,
+                              member.foil[0],
+                              -int(member.foil[1:]),
+                              member.last_name,
+                              member.first_name))  
+
         # sort output by region, rating,rating year desc and then last name,first name
     return render_template('main/USFA_list.jinja2', members=USFA_members, title='USFA Rated Female Foilists')
 

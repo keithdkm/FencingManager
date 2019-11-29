@@ -3,11 +3,8 @@
 {% block app_content %}
 {% set test_data = {'rating': 'A4', 'entrants' : [('Achilova, Feyza', 'D19'),('Miller, Naomi', 'C19'),('Adams,Kim', 'B19')]} %}
 {% set event_types =  ['Cadet','Junior','Division II','Division IA', 'Division I']  %}
-        <h1>Upcoming Tournaments</h1>
-  <!-- Header -->
-  {# <header class="container">
-    <h5><b><i class="fa"></i> </b></h5>
-  </header> #}
+<h1>Upcoming Tournaments</h1>
+<h4>Last Updated: {{refresh_date[0].strftime('%#m/%#d/%y %H:%M%p')}}</h4>  
  
   <div class="container">
     <table class="table table-striped dropdown">
