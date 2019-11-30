@@ -122,8 +122,8 @@ def USFA():
             .filter(Member.gender == 'F')
             .all())
     
-    USFA_members = sorted(data = USFA_members,\
-                          key = lambda member:(\
+    USFA_members = sorted(USFA_members,
+                          key = lambda member:(
                               member.region,
                               member.foil[0],
                               -int(member.foil[1:]),
