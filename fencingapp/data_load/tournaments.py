@@ -123,8 +123,10 @@ def load_tournaments_from_USFA(season,whole_season=True,\
 
     # generate csv file and/or refresh table 
     if to_csv:
-        file_ = 'scraped_tournament_'+str(season.start.year)+'.csv'
-        debug_file_path = os.path.abspath('~/debug')
+        if not os.path.isdir(os.path.abspath('testing/debug')):
+            os.mkdir(os.path.abspath('testing/debug'))
+        debug_file_path = os.path.abspath('testing/debug')
+        file_ = 'scraped_tournament_'+ str(season.start.year)+'.csv'
         tournament_df.to_csv(Path(debug_file_path,file_))  # DEBUG
     if refresh_table:
         try: 
