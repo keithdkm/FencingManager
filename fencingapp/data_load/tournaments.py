@@ -87,8 +87,8 @@ def load_tournaments_from_USFA(season,whole_season=True,\
                                                     ).tournament_list])
     print(f'Finished getting SJCC tournaments for {season}.')
 
-    # if not whole_season: # 
-    #     tournament_df = tournament_df[tournament_df.start>dt.now()]
+    if not whole_season: # 
+        tournament_df = tournament_df[tournament_df.start>dt.now()]
 
     #     Populate Region number for Regional Tournaments
     tournament_df['region'] = tournament_df.apply(
