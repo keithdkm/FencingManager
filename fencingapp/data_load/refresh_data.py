@@ -20,20 +20,12 @@ app = create_app()
 app.app_context().push() 
 
 
-
-
-
 # Refresh Members to get latest ratings data
-# TODO improve logic to set this season
-# print('Loading Seasons')
-# st = dt.strptime
-
-# this_season = Season(st("08/01/2019","%m/%d/%Y"),st("07/31/2020","%m/%d/%Y"))
-# last_season = Season(st("08/01/2018","%m/%d/%Y"),st("07/31/2019","%m/%d/%Y"))
-# next_season = Season(st("08/01/2020","%m/%d/%Y"),st("07/31/2021","%m/%d/%Y"))
-# db.session.add_all([this_season,last_season,next_season])
-# db.session.commit()
 this_season = Season.query.filter(Season.start<=dt.today(),Season.end>=dt.today()).first()
+
+this_time_last_year = dt.today()-timedelta(days=365)
+
+last_season = Season.query.filter(Season.start<=(this_time_last_year),Season.end>=this_time_last_year).first()
 
 # Refresh members every time app runs to get latest fencer ratings
 print ('Loading members')
@@ -44,7 +36,7 @@ print('Members loaded successfully')
 
 # Refresh tournaments if the most recent update was more than 7 days ago
 print('Starting tournament load')
-MAX_DAYS_SINCE_TOURNAMENT_REFRESH=7
+
 Tournament_table_empty = Tournament.query.count()==0
 if Tournament_table_empty:
         db.session.commit()   # removes locks on table
@@ -52,11 +44,19 @@ if Tournament_table_empty:
                                 whole_season=True,
                                 to_csv=False,
                                 refresh_table=True) 
+        # load_tournaments_from_USFA(last_season,
+        #                         whole_season=True,
+        #                         to_csv=False,
+        #                         refresh_table=True) 
+        
 else:
-    Tournament_data_stale = Tournament.query.with_entities( # get date of most recent update to tournament table
-                            func.max(Tournament.updated_on))[0][0]<\
-                            dt.utcnow()-timedelta(days=MAX_DAYS_SINCE_TOURNAMENT_REFRESH)
+    
+    MAX_DAYS_SINCE_TOURNAMENT_REFRESH=7
+    Last_date_of_refresh  = db.session.query(db.func.max(Tournament.updated_on)).scalar()
+    date_refresh_required_after = dt.utcnow()-timedelta(days=MAX_DAYS_SINCE_TOURNAMENT_REFRESH)
 
+    Tournament_data_stale = Last_date_of_refresh < date_refresh_required_after 
+                              
     if Tournament_data_stale:
          # if tournament table is empty or if it hasn't been refreshed
         db.session.commit()    # removes locks on table
