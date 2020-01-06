@@ -140,10 +140,10 @@ class Tournament():
     def __init__(self,name):
         # Future - automatically pick out the events Naomi is fencing in. Find //*[@id="events-by-day"] usinng this XPatch query and this one to find registered event /html/body/div[2]/div[1]/div/div/div/div/div[1]/div[4]/div/div[2]/div[2]/div[8]/div[6]/div/span[1]/span[2]
         #      /html/body/div[2]/div[1]/div/div/div/div/div[1]/div[4]/div/div[2]/div[2]/div[8]/div[6]/span[3]/a
-        JWF  = Event("Junior Womens's Foil", datetime(2019,11,10,8,0),
-                     'https://member.usafencing.org/details/tournaments/4158/entrants?event_id=28837&_=1573346339192')
-        CWF  = Event("Cadet Women's Foil" , datetime(2019,11,11,8,0),
-                     'https://member.usafencing.org/details/tournaments/4158/entrants?event_id=28844&_=1573346339193')
+        JWF  = Event("Junior Womens's Foil", datetime(2020,1,6,8,0),
+                     'https://member.usafencing.org/details/tournaments/4158/entrants?event_id=28947')
+        DIWF  = Event("Div I Women's Foil" , datetime(2020,1,3,12,0),
+                     'https://member.usafencing.org/details/tournaments/4158/entrants?event_id=28941')
         # DIIWF = Event("DivII Women's Foil", datetime(2019,10,19,8,0),
         #              'https://member.usafencing.org/details/tournaments/3877/entrants?event_id=28821')
         # Y14WF = Event("Y14 Women's Foil", datetime(2019,7,4,8,0),
@@ -154,7 +154,7 @@ class Tournament():
         self.name = name
         self.events = {
                        JWF.short_name:JWF,
-                       CWF.short_name:CWF,
+                       DIWF.short_name:DIWF,
                     #    DIIWF.short_name:DIIWF,
                     #    Y14WF.short_name:Y14WF,
                     #    DIWF.short_name:DIWF
@@ -294,11 +294,11 @@ class Tournament():
 ########  MAIN ###########################################################
 # 
 
-NovNAC = Tournament("2019 November NAC")
+tournament = Tournament("2020 January NAC")
 try:
-    NovNAC.create_workbook()
+    tournament.create_workbook()
 except:
     SystemExit('Excel file already open')
 
-print(f'created spreadsheet for {NovNAC.name}')
-NovNAC.build_tables()
+print(f'created spreadsheet for {tournament.name}')
+tournament.build_tables()
