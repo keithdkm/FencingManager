@@ -4,6 +4,7 @@ logs/
 testing/
 .vscode/
 docs/
+venv/
 
 # File types
 *.pyc
