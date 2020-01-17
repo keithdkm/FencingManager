@@ -64,9 +64,12 @@ def load_members_to_db_from_csv():
     member_data['updated_on'] = member_data['created_on'] = dt.utcnow()
 
     #clear the existing contents of the member table
-    print('dropping user table constraint')                          # TODO remove hardcoded CONSTRAINT name
-    db.engine.execute('ALTER TABLE users DROP CONSTRAINT users_member_id_fkey')  # drop FK constraint with user table
-    db.session.commit()
+    print('dropping user table constraint')  
+    try:                        # TODO remove hardcoded CONSTRAINT name
+        db.engine.execute('ALTER TABLE users DROP CONSTRAINT users_member_id_fkey')  # drop FK constraint with user table
+        db.session.commit()
+    except:
+        pass
     print("deleting old table contents")
     Member.query.delete()
     db.session.commit()
