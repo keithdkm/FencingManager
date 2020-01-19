@@ -48,7 +48,7 @@ def load_tournaments_from_USFA(season,whole_season=True,\
     if whole_season:   # season_filter passed as parameter to website to filter results
         season_filter = season_code      # give me the whole season
     else:
-        season_filter = 'future&designated'   # give me tournaments that haven't started yet
+        season_filter = 'future&designated='   # give me tournaments that haven't started yet
 
 
     # Fetch national tournaments
@@ -81,8 +81,8 @@ def load_tournaments_from_USFA(season,whole_season=True,\
                                ScrapeTournamentsList(
                                     USFA_URLs.REGIONAL_TOURNAMENT_SEARCH,
                                     search_params ={
-                                                 'filter_by_show': 'future&designated',
-                                                 'event_scopes': 'sjcc'},
+                                                 'filter_by_show': season_filter,
+                                                 'event_scopes': 'scc'},
                                     tourn_type = 'SJCC'     # tournament type to include in tournament data
                                                     ).tournament_list])
     print(f'Finished getting SJCC tournaments for {season}.')
