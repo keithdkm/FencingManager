@@ -51,7 +51,7 @@ if Tournament_table_empty:
         
 else:
     
-    MAX_DAYS_SINCE_TOURNAMENT_REFRESH=0
+    MAX_DAYS_SINCE_TOURNAMENT_REFRESH=7
     Last_date_of_refresh  = db.session.query(db.func.max(Tournament.updated_on)).scalar()
     date_refresh_required_after = dt.utcnow()-timedelta(days=MAX_DAYS_SINCE_TOURNAMENT_REFRESH)
 
@@ -61,7 +61,7 @@ else:
          # if tournament table is empty or if it hasn't been refreshed
         db.session.commit()    # removes locks on table
         load_tournaments_from_USFA(this_season,
-                                    whole_season=True,
+                                    whole_season=False,
                                     to_csv=False,
                                     refresh_table=True) 
     print('Tournament refresh complete')
